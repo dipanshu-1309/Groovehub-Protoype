@@ -22,7 +22,7 @@ useEffect(()=>{
 
     if (session){
       setAuth(session?.user);
-      updateUserData(session?.user);
+      updateUserData(session?.user, session?.user?.email);
       router.replace('/home');
     }else{
       setAuth(null);
@@ -33,9 +33,9 @@ useEffect(()=>{
   })
 },[])
 
-  const updateUserData = async (user) => {
+  const updateUserData = async (user, email) => {
     let res = await getUserdata(user?.id);
-    if(res.success) setUserData(res.data);
+    if(res.success) setUserData(...res.data,email);
   }
 
   return (
