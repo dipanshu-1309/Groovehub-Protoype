@@ -100,14 +100,11 @@ const UserHeader = ({user, router, handleLogout}) =>{
               <Text style={styles.infoText}>{user.bio}</Text>
             )
           }
+         </View>
         </View>
+    </View> 
 
-        
-          
-          
-       
-        </View>
-    </View>
+
   )
 }
 
