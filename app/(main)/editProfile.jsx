@@ -1,5 +1,5 @@
-import React from 'react'
-import { View, Text, StyleSheet, ScrollView, Pressable} from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert} from 'react-native'
 import ScreenWrapper from '../../components/ScreenWrapper'
 import Header from '../../components/Header'
 import { hp, wp } from '../../helpers/common'
@@ -10,16 +10,52 @@ import { theme } from '../../constants/theme'
 import Icon from '../../assets/icons'
 import { Image } from 'expo-image'
 import Input from '../../components/input'
+import Button from '../../components/Button'
 
 
 const EditProfile = () => {
 
-  const {user} = useAuth();
+  const {user: currentUser} = useAuth();
+  const [loading, setLoading] = useState(false)
+
+
+  const [user,setUser] = useState({
+      name: '',
+      phoneNumber: '',
+      image: null,
+      bio: '',
+      address: ''
+  });
+
+  useEffect( () => {
+    if(currentUser){
+      setUser({
+        name: currentUser.user_metadata?.name || '',
+        phoneNumber: currentUser.user_metadata?.phoneNumber || '',
+        image: currentUser.user_metadata?.image || null,
+        address: currentUser.user_metadata?.address || '',
+        bio: currentUser.user_metadata?.bio || '',
+      });
+    }
+  },[currentUser])
 
   const OnPickImage = async ()=>{
 
   }
 
+  const onSubmit = async () =>{
+    let userData ={...user};
+    let {name, phoneNumber, address, image, bio} = userData;
+    if(!name || !phoneNumber || !address || !bio){
+      Alert.alert('Profile', "Please fill all the fields");
+      return;
+    }
+    setLoading(true);
+    const res= await updateUser(currentUser?.id, userData);
+    setLoading(false);
+    console.log('update user result: ', res);
+    
+  }
 
   let imageSource = getUserImageSrc(user.image);
 
@@ -41,9 +77,33 @@ const EditProfile = () => {
              <Input
                   icon={<Icon name="user" />}
                   placeholder='Enter your name'
-                  value={null}
-                  onChangeText={value=> {}}
-                  />
+                  value={user.name}
+                  onChangeText={(value) => {
+                    console.log("Updated Name:", value);
+                    setUser({...user, name: value})
+                  }
+                  } />
+              <Input
+                  icon={<Icon name="call" />}
+                  placeholder='Enter your phone number'
+                  value={user.phoneNumber}
+                  onChangeText={value => setUser({...user, phoneNumber: value})
+                  } />
+              <Input
+                  icon={<Icon name="location" />}
+                  placeholder='Enter your Address'
+                  value={user.address}
+                  onChangeText={value => setUser({...user, address: value})
+                  } />
+              <Input
+                  placeholder='Enter your Bio'
+                  value={user.bio}
+                  multiline={true}
+                  containerStyle={styles.bio}
+                  onChangeText={value => setUser({...user, bio: value})
+                  } />
+
+                  <Button title="update" loading={loading} onPress={onSubmit} />
           </View>
         </ScrollView>
       </View>
@@ -64,7 +124,7 @@ const styles = StyleSheet.create({
     right: -10,
     padding: 8,
     borderRadius: 50,
-    backgroundColpr: 'white',
+    backgroundColor: 'white',
     shadowColor: theme.colors.textLight,
     shadowOffest: {width: 0, height: 4},
     shadowOpacity: 0.4,
@@ -87,6 +147,12 @@ const styles = StyleSheet.create({
   form: {
     gap:18,
     marginTop: 20,
+  },
+  bio: {
+    flexDirection: 'row',
+    height: hp(15),
+    alignItems: 'flex-start',
+    paddingVertical: 15,
   }
-
+  
 })
