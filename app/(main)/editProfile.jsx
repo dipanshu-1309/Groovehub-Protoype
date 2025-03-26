@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable, Alert} from 'react-nativ
 import ScreenWrapper from '../../components/ScreenWrapper'
 import Header from '../../components/Header'
 import { hp, wp } from '../../helpers/common'
-import { getUserImageSrc } from '../../services/imageService'
+import { getUserImageSrc, uploadFile } from '../../services/imageService'
 import { useAuth } from '../context/AuthContext'
 
 import { theme } from '../../constants/theme'
@@ -67,6 +67,9 @@ const EditProfile = () => {
     if(typeof image =='object')
     {
       //upload image
+      let imageRes = await uploadFile('profiles', image?.uri, true);
+      if(imageRes.success) userData.image= imageRes.data;
+      else userData.image = null;
     }
     const res= await updateUser(currentUser?.id, userData);
     setLoading(false);

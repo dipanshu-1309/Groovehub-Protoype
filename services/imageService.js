@@ -21,15 +21,27 @@ export const uploadFile = async(folderName, fileUri, isImage=true)=> {
     let{data,error} = await supabase
     .storage 
     .from('uploads')
-    .upload(fileName, imageData)
+    .upload(fileName, imageData, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: isImage? 'image/*': 'video/*'
+    });
+    if (error){
+      console.log('filer upload error: ', error);
+       return {success: false, msg: 'Could not upload media'};
+    }
+    console.log('data: ',data);
+    
+
+    return {succes: true, data: data.path}
   }catch(error){
     console.log('filer upload error: ', error);
-    return {success: false, msg: 'Could not upload media'}
+    return {success: false, msg: 'Could not upload media'};
     
   }
 }
 
 export const getFilePath = (folderName, isImage) => {
   return `/${folderName}/${(new Date()).getTime()}${isImage? '.png': '.mp4' }`;
-  
+
 }
