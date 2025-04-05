@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { View, Text, ScrollView, StyleSheet } from 'react-native'
 import ScreenWrapper from '../../components/ScreenWrapper'
 import Header from '../../components/Header'
@@ -12,11 +12,14 @@ import RichTextEditor from '../../components/RichTextEditor'
 const NewPost = () => {
 
   const {user} = useAuth();
-
+  const bodyRef = useRef("")
+  const editorRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [file, setFile] =  useState(file);
   return (
     <ScreenWrapper bg="white">
       <View style={styles.container}>
-        <Header title="Create Post" />
+        <Header title="Create Post" showBackButton={true}/>
           <ScrollView contentContainerStyle={{gap: 20}}>
             {/*avatar */}
             <View style={styles.header}>
@@ -41,7 +44,7 @@ const NewPost = () => {
                   
             </View>
             <View style={styles.textEditor}>
-                <RichTextEditor />
+                <RichTextEditor editorRef={editorRef} onChange={body=> bodyRef.current = body}/>
             </View>
           </ScrollView>
       </View>
