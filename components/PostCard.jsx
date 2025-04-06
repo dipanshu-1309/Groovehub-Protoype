@@ -1,5 +1,5 @@
-import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import { theme } from '../constants/theme'
 import Avatar from './Avatar'
 import { hp , wp } from '../helpers/common'
@@ -8,6 +8,8 @@ import Icon from '../assets/icons'
 import RenderHtml from 'react-native-render-html';
 import { Image } from 'expo-image'
 import { getSupabseFileUrl } from '../services/imageService'
+import { Video } from 'expo-av'
+import { createPostLike } from '../services/PostService'
 
 const textStyle = {
   colors: theme.colors.dark,
@@ -43,9 +45,50 @@ const PostCard = ({
       elevation: 1
     }
     
+    const[likes, setLikes] = useState([]);
 
+
+    useEffect(()=>{
+      
+    },[])
+
+    const openPostDetails = () =>{
+      //later
+    }
+
+    const onLike = async()=>{
+      if(liked){
+        //remove like
+        let updateLikes= likes.filter(like=> like.userId!=currentUser?.id);
+        setLikes([...likes])
+        let res = await removePostLike(item?.id, currentUser?.id);
+        console.log('removed like ',res);
+        if(!res.success){
+          Alert.alert('Post', 'Something Went Wrong');
+        }
+      }else {
+        //create like
+        let data= {
+          userId: currentuser?.id,
+          postId: item?.id
+        }
+        setLikes([...likes, data])
+        let res = await createPostLike(data);
+        console.log('added like',res);
+        if(!res.success){
+          Alert.alert('Post', 'Something Went Wrong');
+        }
+      }
+      
+      
+    }
 
   const createdAt= moment(item?.created_at).format('MMM D');
+
+  const liked = likes.filter(like=> like.userid==currentUser?.id) 
+  [0]? true: false;
+
+
   return (
     <View style={[styles.container, hasShadow && shadowStyles]}>
       <View style={styles.header}>
@@ -61,7 +104,7 @@ const PostCard = ({
         </View>
         </View>
 
-        <TouchableOpacity  /*</View>onPress={openPostDetails}*/>
+        <TouchableOpacity onPress={openPostDetails}>
           <Icon name="threeDotsHorizontal" size={hp(3.4)} strokeWidth ={3} colors={theme.colors.text} />
         </TouchableOpacity>
       </View>
@@ -78,7 +121,7 @@ const PostCard = ({
             )
           }
         </View>
-
+          {/*post image */}
         {
           item?.file && item?.file?.includes('postImages') && (
             <Image
@@ -89,6 +132,53 @@ const PostCard = ({
               />
           )
         }
+
+        {/* post video */}
+        {
+          item?.file&& item?.file?.includes('postVideos') && (
+            <Video
+              style={[styles.postMedia, {height: hp(30)}]}
+              source={getSupabseFileUrl(item?.file)}
+              useNativeControls
+              resizeMode='cover'
+              isLooping
+              />
+          )
+        }
+      </View>
+
+      {/*like, comment, share */}
+      <View style={styles.footer}>
+      <View style={styles.footerButton}>
+        <TouchableOpacity onPress={onLike}>
+          <Icon name="heart" size={24} fill={liked? theme.colors.rose: 'transparent'} color={liked? theme.colors.rose : theme.colors.textLight} />
+        </TouchableOpacity>
+        <Text style={styles.count}>
+          {
+            likes?.length
+          }
+        </Text>
+      </View>
+
+      <View style={styles.footerButton}>
+        <TouchableOpacity>
+          <Icon name="comment" size={24} color={ theme.colors.textLight} />
+        </TouchableOpacity>
+        <Text style={styles.count}>
+          {
+            0
+          }
+        </Text>
+      </View>
+
+      <View style={styles.footerButton}>
+        <TouchableOpacity>
+          <Icon name="share" size={24} color={theme.colors.textLight} />
+        </TouchableOpacity>
+        
+      </View>
+
+
       </View>
     </View>
   )
@@ -112,5 +202,31 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between'
+  },
+  postMedia: {
+    height: hp(40),
+    width: '100%',
+    borderRadius: theme.radius.xl,
+    borderCurve: 'continuous'
+  },
+  footerButton:{
+    marginLeft: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 18,
+  },
+  count: {
+    color: theme.colors.text,
+    fontSize: hp(1.8)
+  },
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 18,
+  },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 18,
   },
 })
