@@ -35,7 +35,7 @@ const RichTextEditor = ({
               <Text style={{color: tintColor}}>H4</Text>
           }}
           style={styles.richBar}
-          flatContainerStyle={styles.listStyle}
+          flatContainerStyle={styles.flatStyle}
           selectedIconTint={theme.colors.primaryDark}
           editor={editorRef}
           disabled={false}
@@ -67,5 +67,13 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: theme.radius.xl,
     borderColor: theme.colors.gray,
     padding: 5,
-  }
+  },
+  contentStyle: {
+    color: theme.colors.textDark,
+    placeholdercolor: 'gray',
+  },
+  flatStyle: {
+    paddingHorizontal: 8,
+    gap: 3,
+  } 
 })

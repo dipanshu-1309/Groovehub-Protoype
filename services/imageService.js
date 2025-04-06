@@ -1,6 +1,7 @@
 import { decode } from 'base64-arraybuffer';
 import * as FileSystem from 'expo-file-system';
 import { supabase } from '../lib/supabase';
+import { supabaseUrl } from '../constants';
 
 
 export const getUserImageSrc = imagePath => {
@@ -10,6 +11,14 @@ export const getUserImageSrc = imagePath => {
     return require('../assets/images/defaultUser.jpg');
   }
 }
+
+export const getSupabseFileUrl = file => {
+  if(filePath){
+    return {uri: `${supabaseUrl}/storage/v1/object/public/uploads/${filePath}`}
+  }
+  return null;
+}
+
 
 export const uploadFile = async(folderName, fileUri, isImage=true)=> {
   try{
