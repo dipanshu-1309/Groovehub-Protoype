@@ -31,3 +31,31 @@ export const createOrUpdatePost = async (post) =>{
     
   }
 }
+
+
+
+
+export const fetchPosts = async (limit=10) =>{
+  try{
+      const {data, error} = await supabase
+      .from('posts')
+      .select(`
+        *'
+        users (id, name, image)
+        `)
+      .order('created_at', {ascending: false})
+      .limit(limit);
+
+    if(error){
+      console.log('fetchPosts error:', error);
+      return {success: false, msg: 'Could not fetch the posts'};
+    }
+
+    return {success:true, data: data};
+
+  } catch(error){
+    console.log('fetchPosts error:', error);
+    return {success: false, msg: 'Could not fetch the posts'};
+    
+  }
+}

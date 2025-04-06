@@ -1,5 +1,5 @@
-import React from 'react'
-import { View, Text, StyleSheet, Alert, Button, Pressable } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, Alert, Button, Pressable, FlatList } from 'react-native'
 import ScreenWrapper from '../../components/ScreenWrapper'
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../../lib/supabase';
@@ -8,13 +8,29 @@ import { theme } from '../../constants/theme';
 import Icon from '../../assets/icons';
 import { useRouter } from 'expo-router';
 import Avatar from '../../components/Avatar';
+import { fetchPosts } from '../../services/PostService';
+import PostCard from '../../components/PostCard';
 
-
+var limit = 0;
 const  Home = () => {
 
   const {user, setAuth} = useAuth();
   const router = useRouter();
 
+  const[posts, setPosts] = useState([]);
+  
+  useEffect(()=>{
+    getPosts();
+  },[])
+
+  const getPosts = async()=>{
+    //call tha api here
+    limit = limit + 10;
+    let res = await fetchPosts(limit);
+    if(res.success){
+      setPosts(res.data);
+    }
+  }
  // console.log('user: ', user);
   
 
@@ -50,8 +66,21 @@ const  Home = () => {
             </Pressable>
           </View>
         </View>
+
+        {/* posts */}
+        <FlatList
+        data={posts}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.listStyle}
+        keyExtractor={item=> item.id.toString()}
+        renderItem={({item}) => <PostCard
+            item={item}
+            currentUser={user}
+            router={router}
+            />
+      } 
+      />
       </View> 
-{/* <Button title="logout" onPress={onLogout} /> */}
     </ScreenWrapper>
   )
 }
@@ -113,5 +142,9 @@ pillText: {
     color: 'white',
     fontSize: hp(1.2),
     fontWeight: theme.fonts.bold
+},
+listStyle:{
+  paddingTop:20,
+  paddingHorizontal: wp(4)
 }
 });
