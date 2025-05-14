@@ -92,7 +92,7 @@ export const removePostLike = async (postId, userId) =>{
       .delete()
       .eq('userId',userId)
       .eq('postId',postId)
-
+  
     if(error){
       console.log('PostLike error:', error);
       return {success: false, msg: 'Could not remove the post like'};

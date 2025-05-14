@@ -11,7 +11,7 @@ try{
     return{success: false, msg: error?.message};
   }
   return {success: true, data};
-}
+} 
 catch(error){
   console.log('got error: ',error);
   return {success: false, msg: error.message};

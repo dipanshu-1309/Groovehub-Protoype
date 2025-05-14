@@ -42,7 +42,7 @@ export const uploadFile = async(folderName, fileUri, isImage=true)=> {
     console.log('data: ',data);
     
 
-    return {succes: true, data: data.path}
+    return {success: true, data: data.path}
   }catch(error){
     console.log('filer upload error: ', error);
     return {success: false, msg: 'Could not upload media'};
